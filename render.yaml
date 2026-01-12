@@ -4,7 +4,7 @@ services:
     env: python
     region: oregon
     buildCommand: cd backend && pip install -r requirements.txt
-    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
@@ -14,3 +14,15 @@ services:
         value: registry.zynd.ai
       - key: ZYND_MQTT_PORT
         value: 1883
+      - key: POLICY_PARSER_SEED
+        value: tg1MgBlpNr/eOfETkBxyq/1v2POA7u8STtzCNI5bzzI=
+      - key: ELIGIBILITY_VERIFIER_SEED
+        value: h5jR1ClZJgRmXTb1xg+mJUaN2/HAw4MUIQtoC3pLooA=
+      - key: BENEFIT_MATCHER_SEED
+        value: jQWrpr4+MIfPfbhyWTMWT9BKw0mY51OZ8jsYeAmTl5E=
+      - key: CITIZEN_ADVOCATE_SEED
+        value: z0VdeWSHIiJ/HS2xZXFCCY6ml+UPTk6AYnEbxeZOE8c=
+      - key: LLM_MODEL
+        value: gpt-4o-mini
+      - key: LLM_TEMPERATURE
+        value: "0.0"
