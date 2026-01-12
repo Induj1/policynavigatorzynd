@@ -34,6 +34,25 @@
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600;
   }
+
+  /* Mobile responsive utilities */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .active\:scale-98:active {
+    transform: scale(0.98);
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
   
   .card {
     @apply bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow;
