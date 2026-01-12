@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: policy-navigator-backend
+    env: python
+    region: oregon
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ZYND_MQTT_HOST
+        value: registry.zynd.ai
+      - key: ZYND_MQTT_PORT
+        value: 1883

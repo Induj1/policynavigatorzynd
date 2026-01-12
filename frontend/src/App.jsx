@@ -11,20 +11,54 @@ import {
   Network,
   ChevronRight,
   Sparkles,
-  Heart
+  Heart,
+  Search,
+  Globe,
+  TrendingUp,
+  Users,
+  Award,
+  BookOpen,
+  Upload,
+  Bookmark,
+  Share2,
+  Download,
+  Mic,
+  MapPin,
+  HelpCircle,
+  PlayCircle,
+  CheckCircle,
+  FileCheck,
+  Bell,
+  Star,
+  Calendar,
+  Phone,
+  Home,
+  Briefcase,
+  GraduationCap,
+  Baby,
+  Wheat
 } from 'lucide-react';
 import PolicyParser from './components/PolicyParser';
 import EligibilityVerifier from './components/EligibilityVerifier';
 import BenefitMatcher from './components/BenefitMatcher';
 import ChatAdvocate from './components/ChatAdvocate';
 import AgentNetwork from './components/AgentNetwork';
+import HomePage from './components/HomePage';
 import { Badge } from './components/ui';
 import { policyNavigatorAPI } from './services/api';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('chat');
+  const [activeTab, setActiveTab] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [backendStatus, setBackendStatus] = useState('checking');
+  const [language, setLanguage] = useState('en'); // 'en' or 'hi'
+  const [searchQuery, setSearchQuery] = useState('');
+  const [fontSize, setFontSize] = useState('normal'); // 'small', 'normal', 'large'
+  const [bookmarks, setBookmarks] = useState([]);
+  const [showAnnouncements, setShowAnnouncements] = useState(true);
+  const [isListening, setIsListening] = useState(false);
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
 
   useEffect(() => {
     checkBackendHealth();
@@ -40,6 +74,16 @@ function App() {
   };
 
   const tabs = [
+    {
+      id: 'home',
+      name: 'होम',
+      nameEn: 'Home',
+      icon: Home,
+      component: null,
+      color: 'from-blue-500 to-blue-600',
+      description: 'Dashboard',
+      emoji: '🏠'
+    },
     {
       id: 'chat',
       name: 'सहायता चैट',
@@ -155,16 +199,35 @@ function App() {
               </div>
             </div>
 
-            {/* Status Badge */}
-            <div className="hidden md:flex items-center gap-2 bg-white/20 px-4 py-2.5 rounded-full backdrop-blur-md border border-white/30 shadow-sm">
-              <div className={`w-2 h-2 rounded-full ${
-                backendStatus === 'healthy' ? 'bg-green-300 animate-pulse shadow-lg shadow-green-400/50' : 
-                backendStatus === 'checking' ? 'bg-yellow-300 animate-pulse shadow-lg shadow-yellow-400/50' : 
-                'bg-red-300 shadow-lg shadow-red-400/50'
-              }`}></div>
-              <span className="text-sm font-medium text-white/90">
-                {backendStatus === 'healthy' ? 'System Online' : backendStatus === 'checking' ? 'Connecting...' : 'Offline'}
-              </span>
+            {/* Accessibility & Language Controls */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Font Size Control */}
+              <div className="hidden lg:flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
+                <button onClick={() => setFontSize('small')} className={`px-2 py-1 text-xs rounded ${fontSize === 'small' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white'}`}>A</button>
+                <button onClick={() => setFontSize('normal')} className={`px-2 py-1 text-sm rounded ${fontSize === 'normal' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white'}`}>A</button>
+                <button onClick={() => setFontSize('large')} className={`px-2 py-1 text-base rounded ${fontSize === 'large' ? 'bg-white/20 text-white font-bold' : 'text-white/60 hover:text-white'}`}>A</button>
+              </div>
+
+              {/* Language Switcher */}
+              <button 
+                onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+                className="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-lg hover:bg-white/30 transition-all border border-white/30"
+              >
+                <Globe className="w-4 h-4 text-white" />
+                <span className="text-sm font-medium text-white hidden sm:inline">{language === 'en' ? 'हिंदी' : 'English'}</span>
+              </button>
+
+              {/* Status Badge */}
+              <div className="hidden md:flex items-center gap-2 bg-white/20 px-4 py-2.5 rounded-full backdrop-blur-md border border-white/30 shadow-sm">
+                <div className={`w-2 h-2 rounded-full ${
+                  backendStatus === 'healthy' ? 'bg-green-300 animate-pulse shadow-lg shadow-green-400/50' : 
+                  backendStatus === 'checking' ? 'bg-yellow-300 animate-pulse shadow-lg shadow-yellow-400/50' : 
+                  'bg-red-300 shadow-lg shadow-red-400/50'
+                }`}></div>
+                <span className="text-sm font-medium text-white/90">
+                  {backendStatus === 'healthy' ? (language === 'en' ? 'System Online' : 'ऑनलाइन') : backendStatus === 'checking' ? (language === 'en' ? 'Connecting...' : 'कनेक्ट हो रहा है...') : (language === 'en' ? 'Offline' : 'ऑफलाइन')}
+                </span>
+              </div>
             </div>
 
             {/* Mobile Menu Button */}
@@ -239,8 +302,12 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-white/50 p-6">
-          {ActiveComponent && <ActiveComponent />}
+        <div className={`${activeTab === 'home' ? '' : 'bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-white/50 p-6'}`}>
+          {activeTab === 'home' ? (
+            <HomePage language={language} fontSize={fontSize} onNavigate={(tabId) => setActiveTab(tabId)} />
+          ) : (
+            ActiveComponent && <ActiveComponent />
+          )}
         </div>
       </main>
 
