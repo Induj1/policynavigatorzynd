@@ -1,0 +1,15 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.27.0
+python-dotenv>=1.0.0
+pydantic-settings>=2.1.0
+# Compatible versions for zyndai-agent==0.1.5
+langchain>=1.1.0
+langchain-openai>=0.1.0
+zyndai-agent==0.1.5
+chromadb>=0.4.22
+# Compatible with mediapipe and tensorflow in the environment
+pandas>=2.1.0
+numpy>=1.26.0,<2.0.0
+protobuf>=4.25.3,<5.0.0
+pytest>=7.4.0
+httpx>=0.26.0
