@@ -76,6 +76,16 @@ Verify if this citizen is eligible for the scheme.
     
     def _format_criteria(self, criteria: Dict) -> str:
         """Format eligibility criteria for LLM"""
+        if not criteria:
+            return "No specific criteria defined"
+        
+        # Handle if criteria is a string instead of dict
+        if isinstance(criteria, str):
+            return criteria
+        
+        if not isinstance(criteria, dict):
+            return str(criteria)
+        
         lines = []
         for key, value in criteria.items():
             lines.append(f"- {key}: {value}")

@@ -43,7 +43,24 @@ class BenefitMatcherAgent(BaseAgent):
                              available_schemes: List[Dict]) -> Dict:
         """Find and rank schemes suitable for citizen"""
         
-        logger.info(f"Finding matches for citizen profile")
+        logger.info(f"Finding matches for citizen profile with {len(available_schemes)} available schemes")
+        
+        # Validate inputs
+        if not citizen_profile:
+            logger.warning("Empty citizen profile provided")
+            return {
+                "recommendations": [],
+                "summary": "No citizen profile provided",
+                "error": "Invalid input"
+            }
+        
+        if not available_schemes:
+            logger.warning("No schemes available for matching")
+            return {
+                "recommendations": [],
+                "summary": "No schemes currently available",
+                "total_potential_benefit": "0"
+            }
         
         # Create matching prompt
         matching_input = f"""
@@ -56,20 +73,31 @@ Available Government Schemes:
 Recommend the most suitable schemes for this citizen.
 """
         
-        response = self.process(matching_input)
-        
         try:
+            response = self.process(matching_input)
+            
+            # Try to parse JSON response
             import json
             result = json.loads(response)
             num_recommendations = len(result.get("recommendations", []))
             logger.info(f"✓ Found {num_recommendations} matching schemes")
             return result
-        except:
-            logger.warning("LLM response not valid JSON")
+        except json.JSONDecodeError as e:
+            logger.warning(f"LLM response not valid JSON: {e}")
+            # Return a structured response even if parsing fails
             return {
                 "recommendations": [],
-                "summary": response,
+                "summary": response if response else "Failed to generate recommendations",
+                "total_potential_benefit": "Unknown",
                 "error": "Failed to parse matching result"
+            }
+        except Exception as e:
+            logger.error(f"Error in find_matching_schemes: {e}")
+            return {
+                "recommendations": [],
+                "summary": f"Error occurred: {str(e)}",
+                "total_potential_benefit": "0",
+                "error": str(e)
             }
     
     def _format_citizen(self, profile: Dict) -> str:
@@ -88,9 +116,22 @@ Recommend the most suitable schemes for this citizen.
         for i, scheme in enumerate(schemes, 1):
             lines.append(f"\n{i}. {scheme.get('scheme_name', 'Unknown')}")
             lines.append(f"   Department: {scheme.get('department', 'N/A')}")
-            lines.append(f"   Benefit: {scheme.get('benefits', {}).get('description', 'N/A')}")
+            
+            # Handle benefits field - can be string or dict
+            benefits = scheme.get('benefits', 'N/A')
+            if isinstance(benefits, dict):
+                benefit_text = benefits.get('description', 'N/A')
+            else:
+                benefit_text = str(benefits)
+            lines.append(f"   Benefit: {benefit_text}")
+            
+            # Handle eligibility criteria
             eligibility = scheme.get('eligibility_criteria', {})
             if eligibility:
-                lines.append(f"   Eligibility: {eligibility}")
+                if isinstance(eligibility, dict):
+                    eligibility_text = ', '.join([f"{k}: {v}" for k, v in eligibility.items()])
+                else:
+                    eligibility_text = str(eligibility)
+                lines.append(f"   Eligibility: {eligibility_text}")
         
         return "\n".join(lines)
