@@ -86,7 +86,7 @@ const BenefitMatcher = () => {
       const response = await policyNavigatorAPI.findBenefits(profile, availableSchemes);
       setResult(response.data);
       
-      const matchCount = response.data.matching_schemes?.length || 0;
+      const matchCount = response.data.recommendations?.length || 0;
       if (matchCount > 0) {
         toast.success(`Found ${matchCount} matching scheme(s)!`);
       } else {
@@ -303,34 +303,44 @@ const BenefitMatcher = () => {
               <h3 className="text-lg font-semibold">Matching Results</h3>
             </div>
 
-            {result.matching_schemes && result.matching_schemes.length > 0 ? (
+            {result.recommendations && result.recommendations.length > 0 ? (
               <div className="space-y-4">
-                {result.matching_schemes.map((match, index) => (
+                {result.recommendations.map((match, index) => (
                   <div key={index} className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 border border-purple-200">
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-lg text-gray-900">{match.scheme_name || match.name}</h4>
-                      {match.match_score && (
-                        <Badge variant="success">
-                          {Math.round(match.match_score * 100)}% Match
-                        </Badge>
-                      )}
+                      <h4 className="font-semibold text-lg text-gray-900">{match.scheme_name}</h4>
+                      <div className="flex flex-col items-end gap-1">
+                        {match.relevance_score && (
+                          <Badge variant="success">
+                            {Math.round(match.relevance_score * 100)}% Match
+                          </Badge>
+                        )}
+                        {match.priority && (
+                          <Badge variant={match.priority === 'high' ? 'warning' : match.priority === 'medium' ? 'info' : 'secondary'}>
+                            {match.priority.toUpperCase()}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
 
-                    {match.description && (
-                      <p className="text-gray-700 mb-2">{match.description}</p>
-                    )}
-
-                    {match.benefits && (
-                      <div className="mb-2">
-                        <span className="font-medium text-gray-700">Benefits: </span>
-                        <span className="text-gray-900">{match.benefits}</span>
+                    {match.estimated_benefit && (
+                      <div className="mb-2 bg-green-50 border border-green-200 rounded p-2">
+                        <span className="font-medium text-green-700">Benefit: </span>
+                        <span className="text-green-900 font-semibold">{match.estimated_benefit}</span>
                       </div>
                     )}
 
-                    {match.reasoning && (
+                    {match.why_suitable && (
                       <div className="mt-3 pt-3 border-t border-purple-200">
-                        <p className="text-sm font-medium text-gray-700 mb-1">Why this matches:</p>
-                        <p className="text-sm text-gray-600">{match.reasoning}</p>
+                        <p className="text-sm font-medium text-gray-700 mb-1">Why this is suitable for you:</p>
+                        <p className="text-sm text-gray-600">{match.why_suitable}</p>
+                      </div>
+                    )}
+
+                    {match.application_process && (
+                      <div className="mt-3 pt-3 border-t border-purple-200">
+                        <p className="text-sm font-medium text-gray-700 mb-1">How to apply:</p>
+                        <p className="text-sm text-gray-600">{match.application_process}</p>
                       </div>
                     )}
                   </div>
@@ -343,10 +353,17 @@ const BenefitMatcher = () => {
               </div>
             )}
 
-            {result.recommendations && (
+            {result.summary && (
               <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h4 className="font-medium text-blue-900 mb-2">Recommendations</h4>
-                <p className="text-sm text-blue-800">{result.recommendations}</p>
+                <h4 className="font-medium text-blue-900 mb-2">Summary</h4>
+                <p className="text-sm text-blue-800">{result.summary}</p>
+              </div>
+            )}
+
+            {result.total_potential_benefit && (
+              <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border-2 border-green-300">
+                <h4 className="font-medium text-green-900 mb-2">Total Potential Benefit</h4>
+                <p className="text-2xl font-bold text-green-700">{result.total_potential_benefit}</p>
               </div>
             )}
           </Card>
