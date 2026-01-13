@@ -57,14 +57,8 @@ const BenefitMatcher = () => {
   };
 
   const handleFindBenefits = async () => {
-    if (!citizenProfile.age) {
-      toast.error('Please fill in citizen profile');
-      return;
-    }
-
-    const validSchemes = schemes.filter(s => s.name.trim());
-    if (validSchemes.length === 0) {
-      toast.error('Please add at least one scheme');
+    if (!citizenProfile.name || !citizenProfile.age) {
+      toast.error('Please fill in at least your name and age');
       return;
     }
 
@@ -76,14 +70,8 @@ const BenefitMatcher = () => {
         income: parseFloat(citizenProfile.income) || 0,
       };
 
-      const availableSchemes = validSchemes.map(s => ({
-        ...s,
-        min_age: parseInt(s.min_age) || 0,
-        max_age: parseInt(s.max_age) || 999,
-        max_income: parseFloat(s.max_income) || 0,
-      }));
-
-      const response = await policyNavigatorAPI.findBenefits(profile, availableSchemes);
+      // Send empty schemes array - backend will use its own database
+      const response = await policyNavigatorAPI.findBenefits(profile, []);
       setResult(response.data);
       
       const matchCount = response.data.recommendations?.length || 0;
@@ -202,87 +190,7 @@ const BenefitMatcher = () => {
         </div>
       </Card>
 
-      {/* Available Schemes */}
-      <Card>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <span className="w-6 h-6 bg-primary-600 text-white rounded-full flex items-center justify-center text-sm">2</span>
-            Available Schemes
-          </h3>
-          <Button variant="secondary" onClick={addScheme} className="text-sm">
-            <Plus className="w-4 h-4" />
-            Add Scheme
-          </Button>
-        </div>
-
-        <div className="space-y-4">
-          {schemes.map((scheme, index) => (
-            <div key={scheme.id} className="border border-gray-200 rounded-lg p-4 relative">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-medium text-gray-700">Scheme {index + 1}</span>
-                {schemes.length > 1 && (
-                  <button
-                    onClick={() => removeScheme(scheme.id)}
-                    className="text-red-600 hover:text-red-700 p-1"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-3">
-                <Input
-                  label="Scheme Name"
-                  placeholder="Enter scheme name"
-                  value={scheme.name}
-                  onChange={(e) => updateScheme(scheme.id, 'name', e.target.value)}
-                />
-
-                <Input
-                  label="Description"
-                  placeholder="Brief description"
-                  value={scheme.description}
-                  onChange={(e) => updateScheme(scheme.id, 'description', e.target.value)}
-                />
-
-                <div className="md:col-span-2">
-                  <Input
-                    label="Benefits"
-                    placeholder="What benefits does this scheme provide?"
-                    value={scheme.benefits}
-                    onChange={(e) => updateScheme(scheme.id, 'benefits', e.target.value)}
-                  />
-                </div>
-
-                <Input
-                  label="Min Age"
-                  type="number"
-                  placeholder="Minimum age"
-                  value={scheme.min_age}
-                  onChange={(e) => updateScheme(scheme.id, 'min_age', e.target.value)}
-                />
-
-                <Input
-                  label="Max Age"
-                  type="number"
-                  placeholder="Maximum age"
-                  value={scheme.max_age}
-                  onChange={(e) => updateScheme(scheme.id, 'max_age', e.target.value)}
-                />
-
-                <Input
-                  label="Max Income (₹)"
-                  type="number"
-                  placeholder="Income limit"
-                  value={scheme.max_income}
-                  onChange={(e) => updateScheme(scheme.id, 'max_income', e.target.value)}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
+      {/* Action Buttons */}
       <Card>
         <div className="flex gap-3">
           <Button onClick={handleFindBenefits} loading={loading}>
@@ -374,7 +282,15 @@ const BenefitMatcher = () => {
         <div className="flex items-start gap-2">
           <AlertCircle className="w-5 h-5 text-indigo-600 mt-0.5" />
           <div>
-            <h4 className="font-medium text-indigo-900 mb-1">Smart Matching</h4>
+            <h4 className="font-medium text-indigo-900 mb-1">AI-Powered Smart Matching</h4>
+            <p className="text-sm text-indigo-700">
+              Our AI analyzes your profile against 15+ real Indian Government schemes including PM-KISAN, Ayushman Bharat, 
+              PM Awas Yojana, National Scholarship Portal, PM Mudra Yojana, and more. Just fill in your profile and click 
+              'Find Matching Benefits' to get personalized recommendations!
+            </p>
+          </div>
+        </div>
+      </Card>
             <p className="text-sm text-indigo-800">
               The AI analyzes the citizen's complete profile and compares it against all available schemes.
               It provides ranked results with match scores and detailed reasoning for each recommendation.
