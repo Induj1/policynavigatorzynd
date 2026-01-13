@@ -90,7 +90,14 @@ const BenefitMatcher = () => {
       if (matchCount > 0) {
         toast.success(`Found ${matchCount} matching scheme(s)!`);
       } else {
-        toast.info('No matching schemes found');
+        toast('No matching schemes found', {
+          icon: 'ℹ️',
+          style: {
+            borderRadius: '10px',
+            background: '#3b82f6',
+            color: '#fff',
+          },
+        });
       }
     } catch (error) {
       toast.error('Failed to find benefits: ' + (error.response?.data?.detail || error.message));
