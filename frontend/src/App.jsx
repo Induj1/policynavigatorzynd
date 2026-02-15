@@ -47,7 +47,7 @@ import HomePage from './components/HomePage';
 import { Badge } from './components/ui';
 import { policyNavigatorAPI } from './services/api';
 
-function App() {
+export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [backendStatus, setBackendStatus] = useState('checking');
@@ -140,7 +140,7 @@ function App() {
   const activeTabInfo = tabs.find(tab => tab.id === activeTab);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50/30 to-green-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-warm-50 via-amber-50/40 to-earth-50">
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -149,99 +149,68 @@ function App() {
             background: '#fff',
             color: '#374151',
             padding: '16px',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            borderRadius: '16px',
+            boxShadow: '0 10px 40px -10px rgba(245, 158, 11, 0.15)',
           },
         }}
       />
 
-      {/* Government Tricolor Top Bar */}
-      <div className="h-1 bg-gradient-to-r from-orange-400 via-white to-green-500 opacity-80"></div>
+      {/* Tricolor */}
+      <div className="h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]"></div>
 
-      {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 sticky top-0 z-40 shadow-md">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="flex justify-between items-center h-16 sm:h-20 lg:h-24">
-            {/* Logo & Title with Official Logo */}
-            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
-              {/* Official Policy Navigator Logo */}
-              <img 
-                src="/logo.png" 
-                alt="Policy Navigator Logo" 
-                className="w-10 h-10 sm:w-14 sm:h-14 lg:w-20 lg:h-20 object-contain bg-white rounded-full p-1 sm:p-1.5 shadow-lg border border-orange-300 sm:border-2"
+      {/* Header – clean, editorial (no pill dashboard look) */}
+      <header className="bg-white sticky top-0 z-40 border-b border-gray-200/80">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          {/* Top row: logo + tagline + utils */}
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('home'); }} className="flex items-center gap-3 min-w-0">
+              <img
+                src="/logo.png"
+                alt=""
+                className="w-9 h-9 sm:w-10 sm:h-10 object-contain rounded-sm border border-gray-200"
                 onError={(e) => {
-                  // Fallback to emblem if logo not found
                   e.target.style.display = 'none';
-                  e.target.nextElementSibling.style.display = 'flex';
+                  const next = e.target.nextElementSibling;
+                  if (next) { next.classList.remove('hidden'); next.classList.add('flex'); }
                 }}
               />
-              {/* Fallback Emblem (hidden by default) */}
-              <div className="hidden relative w-10 h-10 sm:w-14 sm:h-14 lg:w-20 lg:h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full items-center justify-center shadow-lg sm:shadow-xl border-2 sm:border-4 border-white">
-                <div className="absolute inset-0 bg-white rounded-full opacity-20"></div>
-                <svg className="w-8 h-8 text-blue-900" fill="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="2" />
-                  <circle cx="12" cy="6" r="1" />
-                  <circle cx="12" cy="18" r="1" />
-                  <circle cx="6" cy="12" r="1" />
-                  <circle cx="18" cy="12" r="1" />
-                  <circle cx="8.5" cy="8.5" r="1" />
-                  <circle cx="15.5" cy="15.5" r="1" />
-                  <circle cx="15.5" cy="8.5" r="1" />
-                  <circle cx="8.5" cy="15.5" r="1" />
-                </svg>
+              <div className="hidden w-9 h-9 sm:w-10 sm:h-10 rounded-sm bg-amber-100 border border-amber-200 items-center justify-center">
+                <svg className="w-5 h-5 text-amber-700" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.09 5.1 7.63 12 4.18zM4 8.82l7 3.5v7.36l-7-3.5V8.82zm9 10.86v-7.36l7-3.5v7.36l-7 3.5z"/></svg>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <h1 className="text-sm sm:text-xl lg:text-2xl font-bold text-white truncate">Policy Navigator</h1>
-                </div>
-                <p className="text-[10px] sm:text-xs text-orange-300 font-medium hidden sm:block">भारत सरकार | Government of India</p>
-                <p className="text-[10px] sm:text-xs text-blue-200 hidden md:block">सरकारी योजना सहायक पोर्टल</p>
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Policy Navigator</h1>
+                <p className="text-[10px] sm:text-xs text-gray-500 truncate hidden sm:block">भारत सरकार · Scheme Assistant</p>
               </div>
-            </div>
+            </a>
 
-            {/* Accessibility & Language Controls */}
-            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
-              {/* Font Size Control */}
-              <div className="hidden xl:flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
-                <button onClick={() => setFontSize('small')} className={`px-2 py-1 text-xs rounded ${fontSize === 'small' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white'}`}>A</button>
-                <button onClick={() => setFontSize('normal')} className={`px-2 py-1 text-sm rounded ${fontSize === 'normal' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white'}`}>A</button>
-                <button onClick={() => setFontSize('large')} className={`px-2 py-1 text-base rounded ${fontSize === 'large' ? 'bg-white/20 text-white font-bold' : 'text-white/60 hover:text-white'}`}>A</button>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="hidden sm:flex items-center gap-0.5 text-gray-500">
+                <button onClick={() => setFontSize('small')} className={`px-1.5 py-0.5 text-xs ${fontSize === 'small' ? 'text-gray-900 font-medium' : 'hover:text-gray-700'}`} title="Small text">A</button>
+                <button onClick={() => setFontSize('normal')} className={`px-1.5 py-0.5 text-sm ${fontSize === 'normal' ? 'text-gray-900 font-medium' : 'hover:text-gray-700'}`} title="Normal text">A</button>
+                <button onClick={() => setFontSize('large')} className={`px-1.5 py-0.5 text-base ${fontSize === 'large' ? 'text-gray-900 font-medium' : 'hover:text-gray-700'}`} title="Large text">A</button>
               </div>
-
-              {/* Language Switcher */}
-              <button 
+              <button
                 onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-                className="flex items-center gap-1 sm:gap-2 bg-white/20 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-white/30 transition-all border border-white/30"
+                className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 border-b border-transparent hover:border-gray-400 transition-colors"
               >
-                <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-                <span className="text-xs sm:text-sm font-medium text-white hidden sm:inline">{language === 'en' ? 'हिंदी' : 'English'}</span>
+                {language === 'en' ? 'हिंदी' : 'English'}
               </button>
-
-              {/* Status Badge */}
-              <div className="hidden lg:flex items-center gap-2 bg-white/20 px-3 lg:px-4 py-2 lg:py-2.5 rounded-full backdrop-blur-md border border-white/30 shadow-sm">
-                <div className={`w-2 h-2 rounded-full ${
-                  backendStatus === 'healthy' ? 'bg-green-300 animate-pulse shadow-lg shadow-green-400/50' : 
-                  backendStatus === 'checking' ? 'bg-yellow-300 animate-pulse shadow-lg shadow-yellow-400/50' : 
-                  'bg-red-300 shadow-lg shadow-red-400/50'
-                }`}></div>
-                <span className="text-sm font-medium text-white/90">
-                  {backendStatus === 'healthy' ? (language === 'en' ? 'System Online' : 'ऑनलाइन') : backendStatus === 'checking' ? (language === 'en' ? 'Connecting...' : 'कनेक्ट हो रहा है...') : (language === 'en' ? 'Offline' : 'ऑफलाइन')}
-                </span>
-              </div>
+              <span className="hidden lg:inline-flex items-center gap-1.5 text-xs text-gray-500">
+                <span className={`w-1.5 h-1.5 rounded-full ${backendStatus === 'healthy' ? 'bg-green-500' : backendStatus === 'checking' ? 'bg-amber-400 animate-pulse' : 'bg-red-500'}`} />
+                {backendStatus === 'healthy' ? 'Online' : backendStatus === 'checking' ? '…' : 'Offline'}
+              </span>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 -mr-2 text-gray-600 hover:text-gray-900"
+                aria-label="Menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-white/20 active:bg-white/30 transition-colors touch-manipulation"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
-            </button>
           </div>
 
-          {/* Navigation - Desktop */}
-          <nav className="hidden md:flex border-t border-blue-400/30 mt-2 sm:mt-4 pt-2 sm:pt-4 gap-2 sm:gap-3 pb-3 sm:pb-4 overflow-x-auto scrollbar-hide">
+          {/* Nav: simple text links with underline for active */}
+          <nav className="hidden md:flex gap-0 border-t border-gray-100">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -249,61 +218,46 @@ function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 lg:py-3 rounded-lg transition-all duration-200 border whitespace-nowrap ${
+                  className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
                     isActive
-                      ? 'bg-white text-blue-700 border-orange-300 shadow-md'
-                      : 'bg-white/10 border-white/20 hover:bg-white/20 text-white backdrop-blur-sm'
+                      ? 'text-amber-700 border-amber-500'
+                      : 'text-gray-600 border-transparent hover:text-gray-900 hover:border-gray-300'
                   }`}
                 >
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                  <div className="text-left min-w-0">
-                    <div className="font-semibold text-xs sm:text-sm leading-tight truncate">{tab.nameEn}</div>
-                    <div className={`text-[10px] sm:text-xs mt-0.5 truncate ${
-                      isActive ? 'text-blue-600/80' : 'text-white/70'
-                    }`}>{tab.name}</div>
-                  </div>
+                  <Icon className="w-4 h-4 opacity-80" />
+                  {tab.nameEn}
                 </button>
               );
             })}
           </nav>
-
-          {/* Navigation - Mobile */}
-          {mobileMenuOpen && (
-            <nav className="md:hidden pb-3 space-y-1.5 border-t border-blue-400/30 pt-2 animate-fade-in">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-lg transition-all border touch-manipulation active:scale-98 ${
-                      isActive
-                        ? 'bg-white text-blue-700 border-orange-300 shadow-md'
-                        : 'bg-white/10 border-white/20 active:bg-white/20 text-white backdrop-blur-sm'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5 flex-shrink-0" />
-                    <div className="flex-1 text-left min-w-0">
-                      <div className="font-semibold text-base">{tab.nameEn}</div>
-                      <div className={`text-sm mt-0.5 ${
-                        isActive ? 'text-blue-600/80' : 'text-white/70'
-                      }`}>{tab.name}</div>
-                    </div>
-                  </button>
-                );
-              })}
-            </nav>
-          )}
         </div>
+
+        {/* Mobile nav */}
+        {mobileMenuOpen && (
+          <nav className="md:hidden border-t border-gray-100 bg-gray-50/80 py-2 animate-fade-in">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => { setActiveTab(tab.id); setMobileMenuOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left text-sm ${
+                    isActive ? 'bg-amber-50 text-amber-800 font-medium' : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.nameEn} <span className="text-gray-400 font-normal">— {tab.name}</span>
+                </button>
+              );
+            })}
+          </nav>
+        )}
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
-        <div className={`${activeTab === 'home' ? '' : 'bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-sm border border-white/50 p-4 sm:p-5 lg:p-6'}`}>
+        <div className={`${activeTab === 'home' ? '' : 'bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-amber-100/60 p-4 sm:p-6 lg:p-8'}`}>
           {activeTab === 'home' ? (
             <HomePage language={language} fontSize={fontSize} onNavigate={(tabId) => setActiveTab(tabId)} />
           ) : (
@@ -312,75 +266,53 @@ function App() {
         </div>
       </main>
 
-      {/* Government Footer */}
-      <footer className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 border-t-2 border-orange-400/50 mt-8 sm:mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 text-white">
+      {/* Footer - warm */}
+      <footer className="bg-gradient-to-r from-amber-700 via-amber-600 to-orange-600 border-t border-amber-500/50 mt-10 sm:mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-white">
             <div>
-              <h3 className="font-bold text-orange-200 mb-2 sm:mb-3 text-base sm:text-lg">योजना सहायता | Scheme Assistance</h3>
-              <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-                Digital India Initiative for accessible government scheme information and benefits delivery.
+              <h3 className="font-bold text-amber-100 mb-3 text-lg">योजना सहायता | Scheme Assistance</h3>
+              <p className="text-sm text-amber-50/90 leading-relaxed">
+                Part of Digital India — helping every citizen find the right schemes. Free, simple, and in your language.
               </p>
               <div className="mt-4 flex items-center gap-2">
-                <div className="w-8 h-8 bg-orange-400/80 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                   <Shield className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xs text-blue-100">Secure & Verified Platform</span>
+                <span className="text-sm text-amber-50/90">Secure & verified</span>
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-orange-200 mb-2 sm:mb-3 text-base sm:text-lg">Quick Links</h3>
-              <ul className="text-xs sm:text-sm space-y-1.5 sm:space-y-2 text-blue-100">
-                <li className="flex items-center gap-1.5 sm:gap-2 hover:text-orange-200 transition-colors cursor-pointer touch-manipulation active:text-orange-300">
-                  <ChevronRight className="w-3 h-3 flex-shrink-0" /> <span className="truncate">Government Schemes Portal</span>
-                </li>
-                <li className="flex items-center gap-2 hover:text-orange-200 transition-colors cursor-pointer">
-                  <ChevronRight className="w-3 h-3" /> Digital India
-                </li>
-                <li className="flex items-center gap-2 hover:text-orange-200 transition-colors cursor-pointer">
-                  <ChevronRight className="w-3 h-3" /> MyGov India
-                </li>
-                <li className="flex items-center gap-2 hover:text-orange-200 transition-colors cursor-pointer">
-                  <ChevronRight className="w-3 h-3" /> Help & Support
-                </li>
+              <h3 className="font-bold text-amber-100 mb-3 text-lg">Quick links</h3>
+              <ul className="text-sm space-y-2 text-amber-50/90">
+                <li className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer"><ChevronRight className="w-3 h-3" /> Government Schemes Portal</li>
+                <li className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer"><ChevronRight className="w-3 h-3" /> Digital India</li>
+                <li className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer"><ChevronRight className="w-3 h-3" /> MyGov India</li>
+                <li className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer"><ChevronRight className="w-3 h-3" /> Help & Support</li>
               </ul>
             </div>
             <div>
-              <h3 className="font-bold text-orange-200 mb-3 text-lg">Contact Information</h3>
-              <div className="text-sm space-y-2 text-blue-100">
-                <p className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-green-300" /> AI-Powered Service
-                </p>
-                <p className="flex items-center gap-2">
-                  <Network className="w-4 h-4 text-green-300" /> 24x7 Online Support
-                </p>
-                <p className="mt-3 text-xs text-blue-100">
-                  For technical support: support@policynavigator.gov.in
-                </p>
+              <h3 className="font-bold text-amber-100 mb-3 text-lg">Contact</h3>
+              <div className="text-sm space-y-2 text-amber-50/90">
+                <p className="flex items-center gap-2"><Activity className="w-4 h-4 text-emerald-200" /> AI-assisted service</p>
+                <p className="flex items-center gap-2"><Network className="w-4 h-4 text-emerald-200" /> 24×7 online</p>
+                <p className="mt-3 text-xs">support@policynavigator.gov.in</p>
               </div>
             </div>
           </div>
-          <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-blue-400/30">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 text-xs sm:text-sm">
-              <div className="text-blue-50">
-                <p>© 2026 Policy Navigator - भारत सरकार | Government of India</p>
-                <p className="text-xs text-blue-200 mt-1">National Informatics Centre | Digital India Initiative</p>
-              </div>
-              <div className="flex gap-4 text-xs text-blue-100">
-                <a href="#" className="hover:text-orange-200 transition-colors">Privacy Policy</a>
-                <span>|</span>
-                <a href="#" className="hover:text-orange-200 transition-colors">Terms of Use</a>
-                <span>|</span>
-                <a href="#" className="hover:text-orange-200 transition-colors">Accessibility</a>
-              </div>
+          <div className="mt-8 pt-6 border-t border-amber-500/40 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-amber-50/80">
+            <p>© 2026 Policy Navigator — भारत सरकार | Government of India</p>
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-white transition-colors">Privacy</a>
+              <span>|</span>
+              <a href="#" className="hover:text-white transition-colors">Terms</a>
+              <span>|</span>
+              <a href="#" className="hover:text-white transition-colors">Accessibility</a>
             </div>
           </div>
         </div>
-        {/* Bottom Tricolor Stripe */}
-        <div className="h-1 bg-gradient-to-r from-orange-400 via-white to-green-500 opacity-80"></div>
+        <div className="h-1.5 bg-gradient-to-r from-amber-500 via-white to-emerald-500"></div>
       </footer>
     </div>
   );
 }
-
-export default App;

@@ -6,7 +6,6 @@ import {
   GraduationCap, Baby, Wheat, Briefcase, Heart, Home as HomeIcon,
   ChevronRight, ExternalLink, X, Target
 } from 'lucide-react';
-import { Card, Button, Input, Badge } from './ui';
 
 const HomePage = ({ language = 'en', fontSize = 'normal', onNavigate }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -155,275 +154,200 @@ const HomePage = ({ language = 'en', fontSize = 'normal', onNavigate }) => {
     }
   };
 
+  const docList = [language === 'en' ? 'Aadhaar Card' : 'आधार कार्ड', language === 'en' ? 'Bank account details' : 'बैंक खाता', language === 'en' ? 'Income certificate' : 'आय प्रमाण पत्र', language === 'en' ? 'Address proof' : 'पता प्रमाण', language === 'en' ? 'Education certificates' : 'शैक्षिक प्रमाण', language === 'en' ? 'Mobile number' : 'मोबाइल नंबर'];
+
   return (
-    <div className={`space-y-4 sm:space-y-6 lg:space-y-8 ${fontSize === 'large' ? 'text-lg' : fontSize === 'small' ? 'text-sm' : 'text-base'}`}>
-      {/* Announcements Banner */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-lg">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-            <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-white animate-pulse flex-shrink-0" />
-            <p className="text-white font-medium text-xs sm:text-sm lg:text-base truncate">{announcements[currentAnnouncement].text}</p>
-            <Badge variant={announcements[currentAnnouncement].type === 'new' ? 'success' : 'info'} size="sm" className="hidden sm:inline-flex flex-shrink-0">
-              {announcements[currentAnnouncement].type === 'new' ? (language === 'en' ? 'NEW' : 'नया') : (language === 'en' ? 'UPDATE' : 'अपडेट')}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-            {announcements.map((_, index) => (
-              <div
-                key={index}
-                className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all ${
-                  index === currentAnnouncement ? 'bg-white w-3 sm:w-4' : 'bg-white/50'
-                }`}
-              />
-            ))}
-          </div>
+    <div className={`${fontSize === 'large' ? 'text-lg' : fontSize === 'small' ? 'text-sm' : 'text-base'}`}>
+      {/* Announcement banner */}
+      <div className="flex items-center gap-3 rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3 mb-8">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+          <Bell className="h-4 w-4 text-emerald-700" />
+        </div>
+        <p className="min-w-0 flex-1 text-sm font-medium text-emerald-900">{announcements[currentAnnouncement].text}</p>
+        <div className="flex gap-1.5">
+          {announcements.map((_, i) => (
+            <button key={i} onClick={() => setCurrentAnnouncement(i)} className={`rounded-full ${i === currentAnnouncement ? 'h-2 w-5 bg-emerald-500' : 'h-2 w-2 bg-emerald-200'}`} aria-label="Announcement" />
+          ))}
         </div>
       </div>
 
-      {/* Hero Section with Statistics */}
-      <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl text-white">
-        <div className="text-center mb-4 sm:mb-6 lg:mb-8">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 sm:mb-3 px-2">
-            {language === 'en' ? 'Welcome to Policy Navigator' : 'पॉलिसी नेविगेटर में आपका स्वागत है'}
-          </h2>
-          <p className="text-blue-100 text-sm sm:text-base lg:text-lg px-2">
-            {language === 'en' ? 'Your AI-powered guide to government schemes and benefits' : 'सरकारी योजनाओं और लाभों के लिए आपका AI-संचालित मार्गदर्शक'}
-          </p>
+      {/* Hero */}
+      <section className="rounded-2xl bg-gradient-to-br from-slate-50 to-emerald-50/50 border border-slate-100 p-6 sm:p-8 lg:p-10 mb-10">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+          {language === 'en' ? 'Find schemes that are right for you' : 'आपके लिए सही योजनाएं खोजें'}
+        </h1>
+        <p className="mt-2 max-w-xl text-slate-600 sm:text-lg">
+          {language === 'en' ? 'Search by keyword or use the tools below. Available in English and Hindi.' : 'कीवर्ड से खोजें या नीचे दिए टूल इस्तेमाल करें। अंग्रेजी और हिंदी में उपलब्ध।'}
+        </p>
+        <div className="relative mt-6 max-w-2xl">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={language === 'en' ? 'e.g. scholarship, PM Kisan, Ayushman Bharat…' : 'जैसे छात्रवृत्ति, पीएम किसान…'}
+            className="h-12 w-full rounded-xl border border-slate-200 bg-white pl-12 pr-28 text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+          />
+          <button onClick={handleVoiceSearch} className={`absolute right-14 top-1/2 -translate-y-1/2 rounded-lg p-2 ${isListening ? 'bg-red-100 text-red-600' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`} title={language === 'en' ? 'Voice search' : 'वॉइस खोज'}>
+            <Mic className="h-5 w-5" />
+          </button>
+          <button className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">
+            {language === 'en' ? 'Search' : 'खोजें'}
+          </button>
         </div>
+      </section>
 
-        {/* Search Bar */}
-        <div className="max-w-3xl mx-auto">
-          <div className="relative">
-            <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={language === 'en' ? 'Search for schemes, benefits, eligibility...' : 'योजनाओं, लाभों, पात्रता के लिए खोजें...'}
-              className="w-full pl-9 sm:pl-12 pr-20 sm:pr-24 py-3 sm:py-4 rounded-lg sm:rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-lg text-sm sm:text-base lg:text-lg"
-            />
-            <button
-              onClick={handleVoiceSearch}
-              className={`absolute right-12 sm:right-16 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-lg transition-all touch-manipulation active:scale-95 ${
-                isListening ? 'bg-red-500 text-white animate-pulse' : 'hover:bg-gray-100 text-gray-600'
-              }`}
-              title={language === 'en' ? 'Voice Search' : 'वॉइस खोज'}
-            >
-              <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            <button className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 rounded-lg transition-all shadow-md text-sm sm:text-base touch-manipulation active:scale-98">
-              {language === 'en' ? 'Search' : 'खोजें'}
-            </button>
-          </div>
-          <div className="mt-2 sm:mt-3 text-center text-blue-100 text-xs sm:text-sm px-2">
-            💡 {language === 'en' ? 'Try: "education scholarship", "farmer scheme", "housing loan"' : 'आजमाएं: "शिक्षा छात्रवृत्ति", "किसान योजना", "आवास ऋण"'}
-          </div>
-        </div>
-      </div>
-
-      {/* Scheme Categories */}
-      <div>
-        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2 px-1">
-          <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-          {language === 'en' ? 'Browse by Category' : 'श्रेणी के अनुसार ब्राउज़ करें'}
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
-          {categories.map((category) => {
-            const Icon = category.icon;
+      {/* Categories */}
+      <section className="mb-10">
+        <h2 className="mb-4 text-lg font-semibold text-slate-900">
+          {language === 'en' ? 'Browse by category' : 'श्रेणी के अनुसार ब्राउज़ करें'}
+        </h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {categories.map((cat) => {
+            const Icon = cat.icon;
             return (
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all hover:scale-105 active:scale-100 touch-manipulation ${
-                  selectedCategory === category.id
-                    ? 'border-orange-400 bg-orange-50 shadow-lg'
-                    : 'border-gray-200 bg-white hover:border-blue-300 shadow-sm'
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`flex flex-col items-center gap-3 rounded-xl border-2 bg-white p-4 text-center shadow-sm transition-all hover:shadow-md ${
+                  selectedCategory === cat.id ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-100 hover:border-slate-200'
                 }`}
               >
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-1.5 sm:mb-2 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center`}>
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${cat.color}`}>
+                  <Icon className="h-6 w-6 text-white" />
                 </div>
-                <div className="text-center">
-                  <div className="font-semibold text-gray-900 text-xs sm:text-sm mb-0.5 sm:mb-1 leading-tight">{category.name}</div>
-                  <div className="text-[10px] sm:text-xs text-gray-600">{category.count} {language === 'en' ? 'schemes' : 'योजनाएं'}</div>
-                </div>
+                <span className="text-sm font-medium text-slate-900">{cat.name}</span>
+                <span className="text-xs text-slate-500">{cat.count} {language === 'en' ? 'schemes' : 'योजनाएं'}</span>
               </button>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* Popular Schemes */}
-      <div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <TrendingUp className="w-6 h-6 text-orange-600" />
-          {language === 'en' ? 'Popular Schemes' : 'लोकप्रिय योजनाएं'}
-        </h3>
-        <div className="grid md:grid-cols-2 gap-4">
+      {/* Primary actions */}
+      <section className="mb-10">
+        <h2 className="mb-4 text-lg font-semibold text-slate-900">
+          {language === 'en' ? 'Get started' : 'शुरू करें'}
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <button
+            onClick={() => onNavigate && onNavigate('verifier')}
+            className="group flex items-start gap-4 rounded-xl border-2 border-slate-100 bg-white p-5 text-left shadow-sm transition-all hover:border-emerald-200 hover:shadow-md"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-100">
+              <CheckCircle className="h-6 w-6 text-emerald-600" />
+            </div>
+            <div>
+              <span className="font-semibold text-slate-900">{language === 'en' ? 'Check eligibility' : 'पात्रता जांचें'}</span>
+              <p className="mt-0.5 text-sm text-slate-500">{language === 'en' ? 'See if you qualify for a scheme' : 'देखें कि आप योजना के योग्य हैं'}</p>
+            </div>
+            <ChevronRight className="ml-auto h-5 w-5 text-slate-300 group-hover:text-emerald-500" />
+          </button>
+          <button
+            onClick={() => onNavigate && onNavigate('matcher')}
+            className="group flex items-start gap-4 rounded-xl border-2 border-slate-100 bg-white p-5 text-left shadow-sm transition-all hover:border-emerald-200 hover:shadow-md"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+              <Target className="h-6 w-6 text-slate-600" />
+            </div>
+            <div>
+              <span className="font-semibold text-slate-900">{language === 'en' ? 'Find schemes for me' : 'मेरे लिए योजनाएं खोजें'}</span>
+              <p className="mt-0.5 text-sm text-slate-500">{language === 'en' ? 'Get personalised recommendations' : 'व्यक्तिगत सिफारिशें प्राप्त करें'}</p>
+            </div>
+            <ChevronRight className="ml-auto h-5 w-5 text-slate-300 group-hover:text-emerald-500" />
+          </button>
+        </div>
+        <div className="mt-3 flex gap-4">
+          <button onClick={() => setShowFAQ(true)} className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline">
+            {language === 'en' ? 'FAQs' : 'सवाल-जवाब'}
+          </button>
+          <button onClick={() => onNavigate && onNavigate('chat')} className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline">
+            {language === 'en' ? 'Help' : 'सहायता'}
+          </button>
+        </div>
+      </section>
+
+      {/* Popular schemes */}
+      <section className="mb-10">
+        <h2 className="mb-4 text-lg font-semibold text-slate-900">
+          {language === 'en' ? 'Often applied for' : 'अक्सर आवेदन'}
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
           {popularSchemes.map((scheme) => (
-            <div key={scheme.id} className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all">
-              <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-base sm:text-lg font-bold text-gray-900">{language === 'en' ? scheme.name : scheme.nameHi}</h4>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">{scheme.description}</p>
+            <div key={scheme.id} className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h3 className="font-semibold text-slate-900">{language === 'en' ? scheme.name : scheme.nameHi}</h3>
+                  <p className="mt-0.5 text-sm text-slate-500">{scheme.description}</p>
                 </div>
                 {scheme.trending && (
-                  <Badge variant="warning" size="sm" className="flex-shrink-0">
-                    <Star className="w-3 h-3 sm:mr-1" />
-                    <span className="hidden sm:inline">{language === 'en' ? 'Trending' : 'ट्रेंडिंग'}</span>
-                  </Badge>
+                  <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                    {language === 'en' ? 'Popular' : 'लोकप्रिय'}
+                  </span>
                 )}
               </div>
-              <div className="flex items-center justify-between">
-                <div className="text-green-600 font-bold text-base sm:text-lg">{scheme.benefits}</div>
-                <Button variant="primary" size="sm" onClick={() => onNavigate && onNavigate('parser')} className="text-xs sm:text-sm touch-manipulation active:scale-95">
-                  <span className="hidden sm:inline">{language === 'en' ? 'View Details' : 'विवरण देखें'}</span>
-                  <span className="sm:hidden">{language === 'en' ? 'View' : 'देखें'}</span>
-                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 ml-0.5 sm:ml-1" />
-                </Button>
+              <div className="mt-4 flex items-center justify-between border-t border-slate-50 pt-4">
+                <span className="font-semibold text-emerald-600">{scheme.benefits}</span>
+                <button onClick={() => onNavigate && onNavigate('parser')} className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline">
+                  {language === 'en' ? 'View details' : 'विवरण देखें'} →
+                </button>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <button
-          onClick={() => onNavigate && onNavigate('verifier')}
-          className="bg-purple-50 border-2 border-purple-200 rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 hover:border-purple-400 hover:shadow-lg transition-all text-left touch-manipulation active:scale-98"
-        >
-          <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600 mb-2 sm:mb-3" />
-          <h4 className="font-bold text-gray-900 mb-0.5 sm:mb-1 text-sm sm:text-base">{language === 'en' ? 'Check Eligibility' : 'पात्रता जांचें'}</h4>
-          <p className="text-xs sm:text-sm text-gray-600">{language === 'en' ? 'Verify if you qualify' : 'सत्यापित करें कि आप योग्य हैं'}</p>
-        </button>
-
-        <button
-          onClick={() => onNavigate && onNavigate('matcher')}
-          className="bg-orange-50 border-2 border-orange-200 rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 hover:border-orange-400 hover:shadow-lg transition-all text-left touch-manipulation active:scale-98"
-        >
-          <Target className="w-8 h-8 sm:w-10 sm:h-10 text-orange-600 mb-2 sm:mb-3" />
-          <h4 className="font-bold text-gray-900 mb-0.5 sm:mb-1 text-sm sm:text-base">{language === 'en' ? 'Find Benefits' : 'लाभ खोजें'}</h4>
-          <p className="text-xs sm:text-sm text-gray-600">{language === 'en' ? 'Discover all schemes' : 'सभी योजनाएं खोजें'}</p>
-        </button>
-
-        <button
-          onClick={() => setShowFAQ(true)}
-          className="bg-blue-50 border-2 border-blue-200 rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 hover:border-blue-400 hover:shadow-lg transition-all text-left touch-manipulation active:scale-98"
-        >
-          <HelpCircle className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600 mb-2 sm:mb-3" />
-          <h4 className="font-bold text-gray-900 mb-0.5 sm:mb-1 text-sm sm:text-base">{language === 'en' ? 'FAQs' : 'अक्सर पूछे जाने वाले प्रश्न'}</h4>
-          <p className="text-xs sm:text-sm text-gray-600">{language === 'en' ? 'Get quick answers' : 'त्वरित उत्तर प्राप्त करें'}</p>
-        </button>
-
-        <button
-          onClick={() => onNavigate && onNavigate('chat')}
-          className="bg-green-50 border-2 border-green-200 rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 hover:border-green-400 hover:shadow-lg transition-all text-left touch-manipulation active:scale-98"
-        >
-          <Phone className="w-8 h-8 sm:w-10 sm:h-10 text-green-600 mb-2 sm:mb-3" />
-          <h4 className="font-bold text-gray-900 mb-0.5 sm:mb-1 text-sm sm:text-base">{language === 'en' ? 'Get Help' : 'सहायता प्राप्त करें'}</h4>
-          <p className="text-xs sm:text-sm text-gray-600">{language === 'en' ? 'Chat with AI assistant' : 'AI सहायक से चैट करें'}</p>
-        </button>
-      </div>
-
-      {/* Document Checklist */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-blue-200">
-        <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-          <FileCheck className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-          {language === 'en' ? 'Common Documents Required' : 'आवश्यक सामान्य दस्तावेज़'}
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-          {[
-            { icon: '', text: language === 'en' ? 'Aadhar Card' : 'आधार कार्ड' },
-            { icon: '', text: language === 'en' ? 'Bank Account Details' : 'बैंक खाता विवरण' },
-            { icon: '', text: language === 'en' ? 'Income Certificate' : 'आय प्रमाण पत्र' },
-            { icon: '', text: language === 'en' ? 'Address Proof' : 'पता प्रमाण' },
-            { icon: '', text: language === 'en' ? 'Educational Certificates' : 'शैक्षिक प्रमाणपत्र' },
-            { icon: '', text: language === 'en' ? 'Mobile Number' : 'मोबाइल नंबर' }
-          ].map((doc, index) => (
-            <div key={index} className="flex items-center gap-2 sm:gap-3 bg-white rounded-lg p-2.5 sm:p-3 border border-blue-100">
-              <span className="text-xl sm:text-2xl flex-shrink-0">{doc.icon}</span>
-              <span className="text-gray-700 font-medium text-xs sm:text-sm truncate">{doc.text}</span>
+      {/* Documents */}
+      <section className="mb-10 rounded-xl border border-slate-100 bg-slate-50/50 p-6">
+        <h2 className="mb-4 text-lg font-semibold text-slate-900">
+          {language === 'en' ? 'Documents you may need' : 'जरूरी दस्तावेज़'}
+        </h2>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {docList.map((text, i) => (
+            <div key={i} className="flex items-center gap-3 rounded-lg bg-white px-3 py-2.5 shadow-sm">
+              <CheckCircle className="h-5 w-5 shrink-0 text-emerald-500" />
+              <span className="text-sm font-medium text-slate-700">{text}</span>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Video Tutorials */}
-      <div>
-        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-3 sm:mb-4 lg:mb-6 flex items-center gap-2 px-1">
-          <PlayCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
-          {language === 'en' ? 'Video Tutorials' : 'वीडियो ट्यूटोरियल'}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-          {[
-            { 
-              title: language === 'en' ? 'How to Apply for Government Schemes' : 'सरकारी योजनाओं के लिए आवेदन कैसे करें',
-              url: 'https://www.youtube.com/embed/bo47QgbMXNA',
-              duration: '8:45',
-              views: '1.2M'
-            },
-            { 
-              title: language === 'en' ? 'Digital India Services Guide' : 'डिजिटल इंडिया सेवा गाइड',
-              url: 'https://www.youtube.com/embed/gqZAGf97AM8',
-              duration: '6:30',
-              views: '856K'
-            },
-            { 
-              title: language === 'en' ? 'How to Track Aadhaar Application Status' : 'आवेदन स्थिति ट्रैक करें',
-              url: 'https://www.youtube.com/embed/OpK6tX05fmE',
-              duration: '4:15',
-              views: '645K'
-            }
-          ].map((video, index) => (
-            <div key={index} className="bg-white rounded-lg sm:rounded-xl overflow-hidden border-2 border-gray-200 hover:border-red-300 hover:shadow-lg transition-all">
-              <div className="relative h-40 sm:h-48 bg-black">
-                <iframe
-                  className="w-full h-full"
-                  src={video.url}
-                  title={video.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
-              <div className="p-3 sm:p-4">
-                <h4 className="font-bold text-gray-900 mb-1.5 sm:mb-2 line-clamp-2 text-sm sm:text-base">{video.title}</h4>
-                <div className="flex items-center justify-between text-xs sm:text-sm text-gray-600">
-                  <span>⏱️ {video.duration}</span>
-                  <span>👁️ {video.views}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* Guides */}
+      <section className="mb-8">
+        <h2 className="mb-4 text-lg font-semibold text-slate-900">
+          {language === 'en' ? 'Guides' : 'गाइड'}
+        </h2>
+        <div className="flex flex-wrap gap-4">
+          <a href="https://www.youtube.com/watch?v=bo47QgbMXNA" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:border-emerald-200 hover:bg-emerald-50/50 hover:text-emerald-700">
+            <PlayCircle className="h-4 w-4" />
+            {language === 'en' ? 'How to apply for schemes' : 'योजनाओं के लिए आवेदन'}
+          </a>
+          <a href="https://www.youtube.com/watch?v=gqZAGf97AM8" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:border-emerald-200 hover:bg-emerald-50/50 hover:text-emerald-700">
+            <PlayCircle className="h-4 w-4" />
+            {language === 'en' ? 'Digital India guide' : 'डिजिटल इंडिया गाइड'}
+          </a>
+          <a href="https://www.youtube.com/watch?v=OpK6tX05fmE" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:border-emerald-200 hover:bg-emerald-50/50 hover:text-emerald-700">
+            <PlayCircle className="h-4 w-4" />
+            {language === 'en' ? 'Track application status' : 'आवेदन स्थिति'}
+          </a>
         </div>
-      </div>
+      </section>
 
       {/* FAQ Modal */}
       {showFAQ && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-xl sm:rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6 lg:p-8 shadow-2xl">
-            <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-blue-600 flex-shrink-0" />
-                <span className="truncate">{language === 'en' ? 'Frequently Asked Questions' : 'अक्सर पूछे जाने वाले प्रश्न'}</span>
-              </h3>
-              <button
-                onClick={() => setShowFAQ(false)}
-                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0 touch-manipulation active:bg-gray-200"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5 sm:w-6 sm:h-6" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl sm:p-8">
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-xl font-semibold text-slate-900">{language === 'en' ? 'Frequently asked questions' : 'अक्सर पूछे जाने वाले प्रश्न'}</h3>
+              <button onClick={() => setShowFAQ(false)} className="rounded-lg p-2 hover:bg-slate-100" aria-label="Close">
+                <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-4">
               {faqs.map((faq, index) => (
-                <div key={index} className="bg-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-5 border border-blue-200">
-                  <h4 className="font-bold text-gray-900 mb-1.5 sm:mb-2 flex items-start gap-2 text-sm sm:text-base">
-                    <span className="text-blue-600 text-base sm:text-lg flex-shrink-0">Q{index + 1}.</span>
-                    <span>{faq.q}</span>
-                  </h4>
-                  <p className="text-gray-700 ml-5 sm:ml-7 text-xs sm:text-sm leading-relaxed">{faq.a}</p>
+                <div key={index} className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+                  <h4 className="font-medium text-slate-900">{faq.q}</h4>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{faq.a}</p>
                 </div>
               ))}
             </div>
