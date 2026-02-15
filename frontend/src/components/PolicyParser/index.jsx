@@ -61,22 +61,12 @@ const PolicyParser = () => {
       toast.success('Document parsed successfully!');
     } catch (error) {
       const status = error.response?.status;
-      // When backend doesn't have /api/parse-scheme-file (e.g. production), fallback: extract text and use parse-scheme
-      if (status === 404 && selectedFile.name.toLowerCase().endsWith('.txt')) {
-        try {
-          const text = await selectedFile.text();
-          const response = await policyNavigatorAPI.parseScheme(text);
-          setResult(response.data);
-          toast.success('Document parsed using text endpoint.');
-        } catch (e) {
-          toast.error('Failed to parse: ' + (e.response?.data?.detail || e.message));
-        }
-      } else if (status === 404) {
+      const detail = error.response?.data?.detail || error.message;
+      if (status === 404) {
         toast.error(
-          'File upload is not available on this server. For PDFs, paste the text above, or run the backend locally and use file upload.'
+          'PDF file upload is not available on this server. Paste the document text above and parse, or run the backend locally for file upload.'
         );
       } else {
-        const detail = error.response?.data?.detail || error.message;
         toast.error('Failed to parse file: ' + detail);
       }
       console.error('Parse file error:', error);

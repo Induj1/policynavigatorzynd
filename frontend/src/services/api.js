@@ -30,8 +30,15 @@ export const policyNavigatorAPI = {
     return response.data;
   },
 
-  // Parse government scheme document from uploaded file (PDF or TXT)
+  // Parse government scheme document from uploaded file (PDF or TXT).
+  // TXT is sent via parse-scheme (works when parse-scheme-file is not deployed); PDF uses file endpoint.
   parseSchemeFile: async (file) => {
+    const isTxt = file.name && file.name.toLowerCase().endsWith('.txt');
+    if (isTxt) {
+      const text = await file.text();
+      const data = await api.post('/api/parse-scheme', { document_text: text });
+      return data.data;
+    }
     const formData = new FormData();
     formData.append('file', file);
     const response = await axios.post(`${API_BASE_URL}/api/parse-scheme-file`, formData);
