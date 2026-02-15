@@ -118,6 +118,7 @@ const BenefitMatcher = () => {
   };
 
   return (
+    <>
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <div className="p-3 bg-purple-100 rounded-lg">
@@ -291,14 +292,8 @@ const BenefitMatcher = () => {
           </div>
         </div>
       </Card>
-            <p className="text-sm text-indigo-800">
-              The AI analyzes the citizen's complete profile and compares it against all available schemes.
-              It provides ranked results with match scores and detailed reasoning for each recommendation.
-            </p>
-          </div>
-        </div>
-      </Card>
     </div>
+    </>
   );
 };
 

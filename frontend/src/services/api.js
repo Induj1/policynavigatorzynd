@@ -22,11 +22,19 @@ export const policyNavigatorAPI = {
     return response.data;
   },
 
-  // Parse government scheme document
+  // Parse government scheme document (text)
   parseScheme: async (documentText) => {
     const response = await api.post('/api/parse-scheme', {
       document_text: documentText,
     });
+    return response.data;
+  },
+
+  // Parse government scheme document from uploaded file (PDF or TXT)
+  parseSchemeFile: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axios.post(`${API_BASE_URL}/api/parse-scheme-file`, formData);
     return response.data;
   },
 

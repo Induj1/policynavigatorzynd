@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
-import { FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { FileText, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 import { Card, Button, TextArea, Badge } from '../ui';
 import { policyNavigatorAPI } from '../../services/api';
 import toast from 'react-hot-toast';
+
+const ALLOWED_FILE_TYPES = '.pdf,.txt';
+const MAX_FILE_MB = 10;
 
 const PolicyParser = () => {
   const [documentText, setDocumentText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleParse = async () => {
     if (!documentText.trim()) {
@@ -28,9 +34,62 @@ const PolicyParser = () => {
     }
   };
 
+  const handleFileSelect = (file) => {
+    if (!file) return;
+    const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
+    if (!['.pdf', '.txt'].includes(ext)) {
+      toast.error('Please upload a PDF or TXT file');
+      return;
+    }
+    if (file.size > MAX_FILE_MB * 1024 * 1024) {
+      toast.error(`File must be under ${MAX_FILE_MB} MB`);
+      return;
+    }
+    setSelectedFile(file);
+  };
+
+  const handleParseFile = async () => {
+    if (!selectedFile) {
+      toast.error('Please select a file first');
+      return;
+    }
+    setLoading(true);
+    setResult(null);
+    try {
+      const response = await policyNavigatorAPI.parseSchemeFile(selectedFile);
+      setResult(response.data);
+      toast.success('Document parsed successfully!');
+    } catch (error) {
+      const status = error.response?.status;
+      const detail = error.response?.data?.detail || error.message;
+      const msg = status === 404
+        ? 'File parse endpoint not found. Restart the backend server so the /api/parse-scheme-file route is loaded, then try again.'
+        : 'Failed to parse file: ' + detail;
+      toast.error(msg);
+      console.error('Parse file error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleClear = () => {
     setDocumentText('');
     setResult(null);
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragActive(false);
+    const file = e.dataTransfer?.files?.[0];
+    if (file) handleFileSelect(file);
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(e.type === 'dragenter' || e.type === 'dragover');
   };
 
   return (
@@ -45,9 +104,52 @@ const PolicyParser = () => {
         </div>
       </div>
 
+      {/* File upload */}
+      <Card>
+        <h3 className="text-lg font-semibold mb-2">Upload document</h3>
+        <p className="text-sm text-gray-600 mb-3">Upload a PDF or TXT file (max {MAX_FILE_MB} MB) to parse as a scheme document.</p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={ALLOWED_FILE_TYPES}
+          className="hidden"
+          onChange={(e) => handleFileSelect(e.target.files?.[0])}
+        />
+        <div
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+            dragActive ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-primary-400 hover:bg-gray-50'
+          }`}
+        >
+          <Upload className="w-10 h-10 mx-auto text-gray-400 mb-2" />
+          <p className="text-gray-600">
+            {selectedFile ? (
+              <span className="font-medium text-primary-600">{selectedFile.name}</span>
+            ) : (
+              <>Drag and drop a file here, or click to choose</>
+            )}
+          </p>
+        </div>
+        <div className="flex gap-3 mt-4">
+          <Button onClick={handleParseFile} loading={loading} disabled={!selectedFile}>
+            <FileText className="w-4 h-4" />
+            Parse from file
+          </Button>
+          {selectedFile && (
+            <Button variant="secondary" onClick={() => { setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}>
+              Remove file
+            </Button>
+          )}
+        </div>
+      </Card>
+
       <Card>
         <TextArea
-          label="Scheme Document Text"
+          label="Or paste scheme document text"
           placeholder="Paste the government scheme document text here... (e.g., eligibility criteria, benefits, application process)"
           value={documentText}
           onChange={(e) => setDocumentText(e.target.value)}
@@ -57,7 +159,7 @@ const PolicyParser = () => {
         <div className="flex gap-3">
           <Button onClick={handleParse} loading={loading}>
             <FileText className="w-4 h-4" />
-            Parse Scheme
+            Parse from text
           </Button>
           <Button variant="secondary" onClick={handleClear} disabled={loading}>
             Clear

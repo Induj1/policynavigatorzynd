@@ -1,11 +1,35 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, UploadFile, File
 from pydantic import BaseModel
 from typing import Dict, List, Optional
 import logging
+import io
 from app.services.agent_communication import AgentCommunicationService
 
 
 logger = logging.getLogger(__name__)
+
+ALLOWED_EXTENSIONS = {".txt", ".pdf"}
+MAX_FILE_SIZE_MB = 10
+
+
+def extract_text_from_file(contents: bytes, filename: str) -> str:
+    """Extract plain text from uploaded file. Supports .txt and .pdf."""
+    name_lower = filename.lower()
+    if name_lower.endswith(".txt"):
+        return contents.decode("utf-8", errors="replace")
+    if name_lower.endswith(".pdf"):
+        try:
+            from pypdf import PdfReader
+            reader = PdfReader(io.BytesIO(contents))
+            parts = []
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    parts.append(text)
+            return "\n\n".join(parts) if parts else ""
+        except Exception as e:
+            raise ValueError(f"Could not extract text from PDF: {e}")
+    raise ValueError(f"Unsupported file type. Use one of: {', '.join(ALLOWED_EXTENSIONS)}")
 
 
 router = APIRouter(prefix="/api", tags=["agents"])
@@ -51,6 +75,43 @@ async def parse_scheme(request: ParseSchemeRequest, req: Request):
         }
     except Exception as e:
         logger.error(f"❌ Error parsing scheme: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/parse-scheme-file")
+async def parse_scheme_file(req: Request, file: UploadFile = File(...)):
+    """Parse a government scheme document from an uploaded file (PDF or TXT)."""
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+    ext = "." + file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}",
+        )
+    max_bytes = MAX_FILE_SIZE_MB * 1024 * 1024
+    contents = await file.read()
+    if len(contents) > max_bytes:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large. Maximum size: {MAX_FILE_SIZE_MB} MB",
+        )
+    try:
+        document_text = extract_text_from_file(contents, file.filename)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not document_text.strip():
+        raise HTTPException(status_code=400, detail="No text could be extracted from the file")
+    logger.info(f"📥 Received parse-scheme-file '{file.filename}' ({len(document_text)} chars extracted)")
+    try:
+        policy_parser = req.app.state.policy_parser
+        if policy_parser is None:
+            raise HTTPException(status_code=503, detail="Agent not initialized")
+        result = policy_parser.parse_scheme_document(document_text)
+        logger.info("📤 Returning parse-scheme-file response")
+        return {"success": True, "data": result, "extracted_length": len(document_text)}
+    except Exception as e:
+        logger.error(f"❌ Error parsing scheme from file: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 
