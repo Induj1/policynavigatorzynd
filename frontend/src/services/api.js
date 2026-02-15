@@ -1,4 +1,27 @@
 import axios from 'axios';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+let pdfWorkerSet = false;
+function setPdfWorker() {
+  if (pdfWorkerSet) return;
+  pdfWorkerSet = true;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+}
+
+async function extractTextFromPdf(arrayBuffer) {
+  setPdfWorker();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const numPages = pdf.numPages;
+  const parts = [];
+  for (let i = 1; i <= numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const text = content.items.map((item) => item.str).join(' ');
+    if (text) parts.push(text);
+  }
+  return parts.join('\n\n');
+}
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -30,19 +53,20 @@ export const policyNavigatorAPI = {
     return response.data;
   },
 
-  // Parse government scheme document from uploaded file (PDF or TXT).
-  // TXT is sent via parse-scheme (works when parse-scheme-file is not deployed); PDF uses file endpoint.
+  // Parse from file: extract text in browser and call parse-scheme (no parse-scheme-file call = no 404).
   parseSchemeFile: async (file) => {
-    const isTxt = file.name && file.name.toLowerCase().endsWith('.txt');
-    if (isTxt) {
-      const text = await file.text();
-      const data = await api.post('/api/parse-scheme', { document_text: text });
-      return data.data;
+    const name = (file.name || '').toLowerCase();
+    let text;
+    if (name.endsWith('.txt')) {
+      text = await file.text();
+    } else if (name.endsWith('.pdf')) {
+      const buffer = await file.arrayBuffer();
+      text = await extractTextFromPdf(buffer);
+    } else {
+      throw new Error('Unsupported file type. Use .txt or .pdf');
     }
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await axios.post(`${API_BASE_URL}/api/parse-scheme-file`, formData);
-    return response.data;
+    const data = await api.post('/api/parse-scheme', { document_text: text });
+    return data.data;
   },
 
   // Verify citizen eligibility
